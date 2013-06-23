@@ -113,7 +113,7 @@ limitlinkler={}
 def iistilde(url):
     charset = set(list('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_'))
     print "IIS tilde acigi taraniyor bu islem biraz surebilir lutfen bekleyin"
-    uzanti=["","jpg","gif","asp","php","aspx","htm","html"]
+    uzanti=["","jpg","gif","asp","php","aspx","htm","html","txt"]
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(),urllib2.HTTPSHandler())    
     opener.addheaders = [("User-agent", "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20100101 Firefox/21.0'"),
         ("Cookie", "0x94Scanner=0x94")]
@@ -126,11 +126,9 @@ def iistilde(url):
 		    response = urlac.code
 		    if response=="404":
 			yaz("IIS tilde acigi var / bulunan veri= "+brutechar+"."+geluzanti,True)
-			break
 		except urllib2.HTTPError,  e:
 		    if(e.code==404):
 			yaz("IIS tilde acigi var / bulunan veri= "+brutechar+"."+geluzanti,True)    
-			break
 		except urllib2.URLError,  e:
 		    print e.reason
 		    mesaj="Hata olustu , sebebi =  %s - %s \n" %(e.reason,urlnormal)
