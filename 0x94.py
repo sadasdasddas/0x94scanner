@@ -4,6 +4,7 @@
 #Python 2x sürümlerde çalışır.
 #Multi Thread  POST|GET (BLIND/TIME BASED/HEADER/SQL/XSS/LFI/CMD) INJECTION SCANNER
 #Microsoft IIS tilde character acigini otomatik test eder.
+#Http trace cross-site scripting acigini test eder
 #Sunucu IP adresi ve kullanilan http bilgisini alir
 #Sunucu Allow header listesini alir
 #Sitedeki tum linkleri 2 farkli yontemle alir (ayni linkleri tarayip zaman kaybi yapmaz)
