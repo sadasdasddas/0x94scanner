@@ -1,7 +1,7 @@
 # 0x94 Scanner v1.0b
 #Python 2x sürümlerde çalışır.
-#mysql eklentisi gerekli onuda https://pypi.python.org/pypi/MySQL-python adresinden kurun
-#Multi Thread  POST|GET (BLIND/TIME BASED/HEADER/SQL/XSS/LFI) INJECTION SCANNER"
+#Multi Thread  POST|GET (BLIND/TIME BASED/HEADER/SQL/XSS/LFI/CMD) INJECTION SCANNER
+#Microsoft IIS tilde character acigini otomatik test eder.
 #Sunucu IP adresi ve kullanilan http bilgisini alir
 #Sunucu Allow header listesini alir
 #Sitedeki tum linkleri 2 farkli yontemle alir (ayni linkleri tarayip zaman kaybi yapmaz)
@@ -32,5 +32,5 @@
 #butun sonuclari rapor.txt ye kaydeder
 #sadece guvenlik testleri icin kullanin
 #Turk sitelerinde tarama yapmaz.
-#https://github.com/antichown/0x94scanner /
+#https://github.com/antichown/0x94scanner
 #https://twitter.com/0x94
